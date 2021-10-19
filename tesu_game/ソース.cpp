@@ -1,9 +1,19 @@
 #include<conio.h>
 #include<stdio.h>
+#include<math.h>
 #define FIELD_WIDTH (256)
 #define FIELD_HEIGHT (16)
 #define SCREEN_WIDTH (16)
 #define SCREEN_HEIGHT (16)
+
+typedef struct {
+	float x, y;
+} VEC2;
+typedef struct {
+	VEC2 position;
+	VEC2 velocity;
+}PLAYER;
+
 char course[FIELD_HEIGHT][FIELD_WIDTH] = {                                                                                                                                                                                                                         
 "                                                                                                                                                                                                                         ",
 "                                                                                                                                                                                         ccccc                           ",
@@ -24,25 +34,47 @@ char course[FIELD_HEIGHT][FIELD_WIDTH] = {
 };
 
 
-char svreen[SCREEN_HEIGHT][SCREEN_WIDTH];
+char screen[SCREEN_HEIGHT][SCREEN_WIDTH];
+char aa[256][2 + 1];
+PLAYER player;
 
 void DrawScreen() {
+	for (int y = 0; y < SCREEN_HEIGHT; y++) 
+		for (int x = 0; x < SCREEN_WIDTH; x++)
+			screen[y][x] = course[y][x];
+	
+	{
+		int x = (int)roundf(player.position.x);
+		int y = (int)roundf(player.position.y);
+		screen[y][x] = '@';
+
+	}
 	for (int y = 0; y < SCREEN_HEIGHT; y++) {
 		for (int x = 0; x < SCREEN_WIDTH; x++)
-			printf(" ");
+			printf("%s",aa[screen[y][x]]);  
 		printf("\n");
 	}
 }
 
 int main() {
-	
-	DrawScreen();
+	sprintf_s(aa[0], "~");
+	sprintf_s(aa[' '], "@");
+	sprintf_s(aa['b'], "¡");
+	sprintf_s(aa['m'], "‚Ö");
+	sprintf_s(aa['t'], "Y");
+	sprintf_s(aa['p'], " "); 
+	sprintf_s(aa['q'], "H");
+	sprintf_s(aa['c'], "`");
+	sprintf_s(aa['g'], "b");
+	sprintf_s(aa['f'], "“c");
+	sprintf_s(aa['@'], "š");
 	/*for (int x = 0; x<FIELD_HEIGHT; x++) {
 		for (int x = 0; x < FIELD_WIDTH; x++)
 	printf(".");
 		printf("\n");
 
 	} */
+	DrawScreen();
 	_getch();
 
 }
