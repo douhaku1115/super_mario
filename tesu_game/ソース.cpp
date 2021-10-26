@@ -1,10 +1,17 @@
 #include<conio.h>
+#include<stdlib.h>
 #include<stdio.h>
 #include<math.h>
+#include<time.h>
 #define FIELD_WIDTH (256)
 #define FIELD_HEIGHT (16)
 #define SCREEN_WIDTH (16)
 #define SCREEN_HEIGHT (16)
+#define UPDATRE_FPS (60)
+#define UPDATE_INTERVAL (1000/UPDATRE_FPS)
+#define DRAW_FPS (10)
+#define DRAW_INTERVAL (1000/DRAW_FPS )
+
 
 typedef struct {
 	float x, y;
@@ -47,13 +54,21 @@ void DrawScreen() {
 		int x = (int)roundf(player.position.x);
 		int y = (int)roundf(player.position.y);
 		screen[y][x] = '@';
-
 	}
+	system("cls");
 	for (int y = 0; y < SCREEN_HEIGHT; y++) {
 		for (int x = 0; x < SCREEN_WIDTH; x++)
 			printf("%s",aa[screen[y][x]]);  
 		printf("\n");
 	}
+}
+
+void Init() {
+
+	player.position = { SCREEN_WIDTH / 2,13 };
+
+	DrawScreen();
+
 }
 
 int main() {
@@ -68,13 +83,22 @@ int main() {
 	sprintf_s(aa['g'], "b");
 	sprintf_s(aa['f'], "“c");
 	sprintf_s(aa['@'], "š");
-	/*for (int x = 0; x<FIELD_HEIGHT; x++) {
-		for (int x = 0; x < FIELD_WIDTH; x++)
-	printf(".");
-		printf("\n");
+	
+	Init();
 
-	} */
-	DrawScreen();
-	_getch();
+	clock_t lastUpdateClock = clock();
+	clock_t lastDrawClock = clock();
+	while(1) {
+		clock_t nowClock = clock();
+		if (nowClock >= lastUpdateClock + UPDATE_INTERVAL) {
+			lastUpdateClock = nowClock;
+			
+		}
+		if (nowClock >= lastDrawClock + DRAW_INTERVAL) {
+			lastDrawClock = nowClock;
+			player.position.x += 1;
+			DrawScreen();
+		}
+	}
 
 }
