@@ -3,6 +3,7 @@
 #include<stdio.h>
 #include<math.h>
 #include<time.h>
+#include<string.h>
 #define FIELD_WIDTH (256)
 #define FIELD_HEIGHT (16)
 #define SCREEN_WIDTH (16)
@@ -44,15 +45,23 @@ char course[FIELD_HEIGHT][FIELD_WIDTH] = {
 char screen[SCREEN_HEIGHT][SCREEN_WIDTH];
 char aa[256][2 + 1];
 PLAYER player;
+bool keyPressed[256];
 
 void DrawScreen() {
+	int scrollX = (int)roundf(player.position.x)- SCREEN_WIDTH/2;
+	if (scrollX < 0)
+		scrollX = 0;
+
+
 	for (int y = 0; y < SCREEN_HEIGHT; y++) 
 		for (int x = 0; x < SCREEN_WIDTH; x++)
-			screen[y][x] = course[y][x];
+			screen[y][x] = course[y][scrollX + x];
 	
 	{
-		int x = (int)roundf(player.position.x);
+		int x = (int)roundf(player.position.x) - scrollX;
 		int y = (int)roundf(player.position.y);
+
+		if(x>=0 && x<SCREEN_WIDTH && y>=0 && y< SCREEN_HEIGHT)
 		screen[y][x] = '@';
 	}
 	system("cls");
@@ -66,7 +75,7 @@ void DrawScreen() {
 void Init() {
 
 	player.position = { SCREEN_WIDTH / 2,13 };
-
+	memset(keyPressed, 0, sizeof keyPressed);
 	DrawScreen();
 
 }
@@ -92,12 +101,43 @@ int main() {
 		clock_t nowClock = clock();
 		if (nowClock >= lastUpdateClock + UPDATE_INTERVAL) {
 			lastUpdateClock = nowClock;
+			float accelsration = 0.005f;
+			if (keyPressed['d'])
+				player.velocity.x += accelsration;
+
+			if (keyPressed['a'])
+				player.velocity.x -= accelsration;
+
+			player.velocity.x *= 0.95f;
+
+			player.position.x += player.velocity.x;
+			player.position.y += player.velocity.y;
+
+		
 			
 		}
 		if (nowClock >= lastDrawClock + DRAW_INTERVAL) {
 			lastDrawClock = nowClock;
-			player.position.x += 1;
+			
 			DrawScreen();
+		}
+		if (_kbhit()) {
+			switch (_getch()) {
+			case 'a':
+				if (keyPressed['d'])
+					keyPressed['d'] = false;
+				else
+					keyPressed['a'] = true;
+				break;
+			case 'd':
+				if (keyPressed['a'])
+					keyPressed['a'] = false;
+				else
+					keyPressed['d'] = true;
+
+				break;
+
+			}
 		}
 	}
 
