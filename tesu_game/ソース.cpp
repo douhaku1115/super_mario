@@ -20,6 +20,7 @@ typedef struct {
 typedef struct {
 	VEC2 position;
 	VEC2 velocity;
+	bool jumping;
 }PLAYER;
 
 char course[FIELD_HEIGHT][FIELD_WIDTH] = {                                                                                                                                                                                                                         
@@ -73,11 +74,23 @@ void DrawScreen() {
 }
 
 void Init() {
-
+	player.velocity = {};
+	player.jumping = false;
 	player.position = { SCREEN_WIDTH / 2,13 };
 	memset(keyPressed, 0, sizeof keyPressed);
 	DrawScreen();
 
+}
+bool IntersectCourse(VEC2 _v) {
+	int x = (int)_v.x;
+	int y = (int)_v.y;
+	switch (course[y][x]) {
+	case 'b':
+	case 'p':
+	case 'q':
+		return true;
+	}
+	return false;
 }
 
 int main() {
@@ -108,10 +121,45 @@ int main() {
 			if (keyPressed['a'])
 				player.velocity.x -= accelsration;
 
+			player.velocity.y += 0.005f;
 			player.velocity.x *= 0.95f;
 
 			player.position.x += player.velocity.x;
 			player.position.y += player.velocity.y;
+
+			VEC2 left = {
+				player.position.x,
+				player.position.y + 0.5f };
+			if (IntersectCourse(left)) {
+				player.position.x = floorf(player.position.x) + 1.0f;
+				player.velocity.x = 0;
+			}
+			VEC2 right = {
+				player.position.x + 1.0f,
+				player.position.y + 0.5f };
+			if (IntersectCourse(right)) {
+				player.position.x = floorf(player.position.x);
+				player.velocity.x = 0;
+			}
+			
+			VEC2 up = {
+				player.position.x + 0.5f,
+				player.position.y};
+			if (IntersectCourse(up)) {
+				player.position.y = floorf(player.position.y) + 1.0f;
+				player.velocity.y = 0;
+			}
+			else
+				player.jumping = true;
+			VEC2 down = {
+				player.position.x + 0.5f,
+				player.position.y + 1.0f };
+			if (IntersectCourse(down)) {
+				player.position.y = floorf(player.position.y);
+				player.velocity.y = 0;
+				player.jumping = false;
+			}
+
 
 		
 			
@@ -134,7 +182,10 @@ int main() {
 					keyPressed['a'] = false;
 				else
 					keyPressed['d'] = true;
-
+				break;
+			default:
+				if(!player.jumping)
+				player.velocity.y = -0.20f;
 				break;
 
 			}
